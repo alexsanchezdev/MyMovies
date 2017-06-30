@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
     public ArrayList<String> mMoviesPosters;
+    public ArrayList<String> mMoviesIds;
     public ImageView mImageView;
     public Context mContext;
     public final static String BASE_POSTER_URL = "http://image.tmdb.org/t/p/w185/";
@@ -83,12 +84,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mClickHandler.onListItemClick(mMoviesPosters.get(clickedPosition));
+            mClickHandler.onListItemClick(mMoviesIds.get(clickedPosition));
         }
     }
 
-    public void setMovieData(ArrayList<String> movieData, Context context) {
-        mMoviesPosters = movieData;
+    public void setMovieData(Context context, ArrayList<String> moviesPosters, ArrayList<String> moviesIds) {
+        mMoviesPosters = moviesPosters;
+        mMoviesIds = moviesIds;
         mContext = context;
         notifyDataSetChanged();
     }

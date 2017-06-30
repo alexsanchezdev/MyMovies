@@ -1,5 +1,7 @@
 package com.alxsnchez.mymovies;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
     ArrayList<String> mMoviesPosters = new ArrayList<String>();
+    ArrayList<String> mMoviesIds = new ArrayList<String>();
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
@@ -53,10 +56,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMoviesAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mMoviesAdapter);
 
-        requestInformation(SORT_RATING);
+        requestInformation(SORT_POPULAR);
 
-        //// TODO: 30/06/2017 Add menu to change between popularity and rating
-        //// TODO: 30/06/2017 Implement click handler for recyclerview
         //// TODO: 30/06/2017 Create new activity for details
         //// TODO: 30/06/2017 Polish loading timing
     }
@@ -104,12 +105,15 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         JSONObject json = new JSONObject(responseData);
                         JSONArray results = json.getJSONArray("results");
                         mMoviesPosters.clear();
+                        mMoviesIds.clear();
                         for (int i=0; i < results.length(); i++)
                         {
                             try {
                                 JSONObject movie = results.getJSONObject(i);
-                                String images = movie.getString("poster_path");
-                                mMoviesPosters.add(images);
+                                String image = movie.getString("poster_path");
+                                String id = String.valueOf(movie.getInt("id"));
+                                mMoviesPosters.add(image);
+                                mMoviesIds.add(id);
                             } catch (JSONException e) {
                                 // Oops
                             }
@@ -123,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("TITLES", mMoviesPosters.get(1));
-                        mMoviesAdapter.setMovieData(mMoviesPosters, MainActivity.this);
+                        mMoviesAdapter.setMovieData(MainActivity.this, mMoviesPosters, mMoviesIds);
                         //
                         // Added as a way to show first movies posters when change the filter and not get stuck at the end of the recyclerview
                         // if we were already there.
@@ -138,6 +141,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public void onListItemClick(String item) {
-        Toast.makeText(this, item, Toast.LENGTH_SHORT).show();
+        Context context = MainActivity.this;
+        Class destinationActivity = DetailActivity.class;
+        Intent intent = new Intent(context, destinationActivity);
+        intent.putExtra("MOVIE_ID", item);
+        startActivity(intent);
     }
 }
