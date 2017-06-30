@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,6 +24,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     public ImageView mImageView;
     public Context mContext;
     public final static String BASE_POSTER_URL = "http://image.tmdb.org/t/p/w185/";
+
+    final private MoviesAdapterOnClickHandler mClickHandler;
+
+    public interface MoviesAdapterOnClickHandler {
+        void onListItemClick(String item);
+    }
+
+    public MoviesAdapter(MoviesAdapterOnClickHandler handler){
+        mClickHandler = handler;
+    }
 
     @Override
     public MoviesAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,18 +66,24 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     }
 
-    public class MoviesAdapterViewHolder extends RecyclerView.ViewHolder {
+    public class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
 
 
         public MoviesAdapterViewHolder(View itemView) {
             super(itemView);
             mImageView = (ImageView) itemView.findViewById(R.id.img_movie_poster);
-
+            itemView.setOnClickListener(this);
         }
 
         void bind(int index){
             Picasso.with(mContext).load(BASE_POSTER_URL + mMoviesPosters.get(index)).into(mImageView);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            mClickHandler.onListItemClick(mMoviesPosters.get(clickedPosition));
         }
     }
 

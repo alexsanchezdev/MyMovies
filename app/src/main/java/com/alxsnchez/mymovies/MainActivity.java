@@ -7,6 +7,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,12 +25,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
     ArrayList<String> mMoviesPosters = new ArrayList<String>();
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
+    private GridLayoutManager mLayoutManager;
 
     final static String BASE_URL = "https://api.themoviedb.org/3/discover/movie";
     final static String API_PARAM = "api_key";
@@ -41,14 +46,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mMoviesAdapter = new MoviesAdapter();
+        mMoviesAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mMoviesAdapter);
 
-        requestInformation();
+        requestInformation(SORT_RATING);
 
         //// TODO: 30/06/2017 Add menu to change between popularity and rating
         //// TODO: 30/06/2017 Implement click handler for recyclerview
@@ -56,11 +61,30 @@ public class MainActivity extends AppCompatActivity {
         //// TODO: 30/06/2017 Polish loading timing
     }
 
-    void requestInformation(){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sort_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_sort_by_popularity) {
+            requestInformation(SORT_POPULAR);
+        } else if (id == R.id.action_sort_by_rating) {
+            requestInformation(SORT_RATING);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    void requestInformation(String requestType){
         OkHttpClient client = new OkHttpClient();
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                 .appendQueryParameter(API_PARAM, API_KEY)
-                .appendQueryParameter(SORT_PARAM, SORT_POPULAR)
+                .appendQueryParameter(SORT_PARAM, requestType)
                 .build();
 
         Request request = new Request.Builder().url(builtUri.toString()).build();
@@ -79,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         JSONObject json = new JSONObject(responseData);
                         JSONArray results = json.getJSONArray("results");
+                        mMoviesPosters.clear();
                         for (int i=0; i < results.length(); i++)
                         {
                             try {
@@ -98,10 +123,21 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("TITLES", mMoviesPosters.get(1));
                         mMoviesAdapter.setMovieData(mMoviesPosters, MainActivity.this);
+                        //
+                        // Added as a way to show first movies posters when change the filter and not get stuck at the end of the recyclerview
+                        // if we were already there.
+                        //
+                        mLayoutManager.scrollToPositionWithOffset(0, 0);
                     }
                 });
             }
         });
+    }
+
+    @Override
+    public void onListItemClick(String item) {
+        Toast.makeText(this, item, Toast.LENGTH_SHORT).show();
     }
 }
