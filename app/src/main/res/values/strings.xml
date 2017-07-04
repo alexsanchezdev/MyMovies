@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Pop Movies</string>
+    <string name="API_KEY">YOUR API KEY GOES HERE</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="score">Score:</string>
+    <string name="most_popular">Most popular</string>
+    <string name="highest_rated">Highest rated</string>
+    <string name="error_message">Unable to load or not information to display.\n\nTry again later.</string>
 </resources>

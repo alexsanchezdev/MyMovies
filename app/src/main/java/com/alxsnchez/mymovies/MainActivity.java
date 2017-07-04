@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,26 +27,27 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
-    ArrayList<String> mMoviesPosters = new ArrayList<String>();
-    ArrayList<String> mMoviesIds = new ArrayList<String>();
+    private final ArrayList<String> mMoviesPosters = new ArrayList<>();
+    private final ArrayList<String> mMoviesIds = new ArrayList<>();
 
-    private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private GridLayoutManager mLayoutManager;
+    private ProgressBar mProgressBar;
 
-    final static String BASE_URL = "https://api.themoviedb.org/3/discover/movie";
-    final static String API_PARAM = "api_key";
-    final static String API_KEY = "YOUR_API_KEY_GOES_HERE";
-    final static String SORT_PARAM = "sort_by";
-    final static String SORT_POPULAR = "popularity.desc";
-    final static String SORT_RATING = "vote_average.desc";
+    private final static String BASE_URL = "https://api.themoviedb.org/3/discover/movie";
+    private final static String API_PARAM = "api_key";
+    private final static String SORT_PARAM = "sort_by";
+    private final static String SORT_POPULAR = "popularity.desc";
+    private final static String SORT_RATING = "vote_average.desc";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
+        mProgressBar = (ProgressBar) findViewById(R.id.main_progress_bar);
+
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
         mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -81,10 +80,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         return super.onOptionsItemSelected(item);
     }
 
-    void requestInformation(String requestType){
+    private void requestInformation(String requestType){
+        showLoading();
+
         OkHttpClient client = new OkHttpClient();
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                .appendQueryParameter(API_PARAM, API_KEY)
+                .appendQueryParameter(API_PARAM, getString(R.string.API_KEY))
                 .appendQueryParameter(SORT_PARAM, requestType)
                 .build();
 
@@ -100,27 +101,33 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 if (!response.isSuccessful()) {
                     throw new IOException("Unexpected code " + response);
                 } else {
-                    String responseData = response.body().string();
-                    try {
-                        JSONObject json = new JSONObject(responseData);
-                        JSONArray results = json.getJSONArray("results");
-                        mMoviesPosters.clear();
-                        mMoviesIds.clear();
-                        for (int i=0; i < results.length(); i++)
-                        {
-                            try {
-                                JSONObject movie = results.getJSONObject(i);
-                                String image = movie.getString("poster_path");
-                                String id = String.valueOf(movie.getInt("id"));
-                                mMoviesPosters.add(image);
-                                mMoviesIds.add(id);
-                            } catch (JSONException e) {
-                                // Oops
+
+                    try{
+                        String responseData = response.body().string();
+                        try {
+                            JSONObject json = new JSONObject(responseData);
+                            JSONArray results = json.getJSONArray("results");
+                            mMoviesPosters.clear();
+                            mMoviesIds.clear();
+                            for (int i=0; i < results.length(); i++)
+                            {
+                                try {
+                                    JSONObject movie = results.getJSONObject(i);
+                                    String image = movie.getString("poster_path");
+                                    String id = String.valueOf(movie.getInt("id"));
+                                    mMoviesPosters.add(image);
+                                    mMoviesIds.add(id);
+                                } catch (JSONException e) {
+                                    // Oops
+                                }
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
+                    } catch (NullPointerException e){
                         e.printStackTrace();
                     }
+
 
                 }
 
@@ -129,10 +136,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                     public void run() {
                         mMoviesAdapter.setMovieData(MainActivity.this, mMoviesPosters, mMoviesIds);
                         //
-                        // Added as a way to show first movies posters when change the filter and not get stuck at the end of the recyclerview
+                        // Added as a way to show first movies posters when change the filter and not get stuck at the end of the recycler view
                         // if we were already there.
                         //
                         mLayoutManager.scrollToPositionWithOffset(0, 0);
+                        hideLoading();
                     }
                 });
             }
@@ -146,5 +154,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         Intent intent = new Intent(context, destinationActivity);
         intent.putExtra("MOVIE_ID", item);
         startActivity(intent);
+    }
+
+    private void showLoading(){
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoading(){
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

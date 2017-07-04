@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:label="Film details"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
