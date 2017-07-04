@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mRecyclerView.setAdapter(mMoviesAdapter);
 
         requestInformation(SORT_POPULAR);
-
-        //// TODO: 30/06/2017 Create new activity for details
-        //// TODO: 30/06/2017 Polish loading timing
     }
 
     @Override
@@ -88,7 +85,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 .appendQueryParameter(API_PARAM, getString(R.string.API_KEY))
                 .appendQueryParameter(SORT_PARAM, requestType)
                 .build();
-
+        
+        //
+        // Obatin a portion of this code example from: http://www.vogella.com/tutorials/JavaLibrary-OkHttp/article.html
+        // as I never used this library before.
+        //
         Request request = new Request.Builder().url(builtUri.toString()).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
