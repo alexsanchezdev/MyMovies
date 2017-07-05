@@ -34,11 +34,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private GridLayoutManager mLayoutManager;
     private ProgressBar mProgressBar;
 
-    private final static String BASE_URL = "https://api.themoviedb.org/3/discover/movie";
+    private final static String BASE_URL = "https://api.themoviedb.org/3/movie";
     private final static String API_PARAM = "api_key";
-    private final static String SORT_PARAM = "sort_by";
-    private final static String SORT_POPULAR = "popularity.desc";
-    private final static String SORT_RATING = "vote_average.desc";
+    private final static String SORT_POPULAR = "popular";
+    private final static String SORT_RATING = "top_rated";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         OkHttpClient client = new OkHttpClient();
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                .appendPath(requestType)
                 .appendQueryParameter(API_PARAM, getString(R.string.API_KEY))
-                .appendQueryParameter(SORT_PARAM, requestType)
                 .build();
 
         Request request = new Request.Builder().url(builtUri.toString()).build();
