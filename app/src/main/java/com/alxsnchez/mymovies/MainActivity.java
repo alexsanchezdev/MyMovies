@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
@@ -29,10 +28,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
-    private final ArrayList<String> mMoviesPosters = new ArrayList<>();
-    private final ArrayList<String> mMoviesIds = new ArrayList<>();
+    private final ArrayList<JSONObject> mMoviesObjects = new ArrayList<>();
 
-    private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private StaggeredGridLayoutManager mLayoutManager;
     private ProgressBar mProgressBar;
@@ -49,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         mProgressBar = (ProgressBar) findViewById(R.id.main_progress_bar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
         mMoviesAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mMoviesAdapter);
 
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 .build();
         
         //
-        // Obatin a portion of this code example from: http://www.vogella.com/tutorials/JavaLibrary-OkHttp/article.html
+        // Obtain a portion of this code example from: http://www.vogella.com/tutorials/JavaLibrary-OkHttp/article.html
         // as I never used this library before.
         //
         Request request = new Request.Builder().url(builtUri.toString()).build();
@@ -116,16 +113,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         try {
                             JSONObject json = new JSONObject(responseData);
                             JSONArray results = json.getJSONArray("results");
-                            mMoviesPosters.clear();
-                            mMoviesIds.clear();
+                            mMoviesObjects.clear();
                             for (int i=0; i < results.length(); i++)
                             {
                                 try {
                                     JSONObject movie = results.getJSONObject(i);
-                                    String image = movie.getString("poster_path");
-                                    String id = String.valueOf(movie.getInt("id"));
-                                    mMoviesPosters.add(image);
-                                    mMoviesIds.add(id);
+                                    mMoviesObjects.add(movie);
                                 } catch (JSONException e) {
                                     // Oops
                                 }
@@ -143,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mMoviesAdapter.setMovieData(MainActivity.this, mMoviesPosters, mMoviesIds);
+                        mMoviesAdapter.setMovieData(MainActivity.this, mMoviesObjects);
                         //
                         // Added as a way to show first movies posters when change the filter and not get stuck at the end of the recycler view
                         // if we were already there.
@@ -157,11 +150,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
     @Override
-    public void onListItemClick(String item) {
+    public void onListItemClick(JSONObject item) {
         Context context = MainActivity.this;
         Class destinationActivity = DetailActivity.class;
         Intent intent = new Intent(context, destinationActivity);
-        intent.putExtra("MOVIE_ID", item);
+        intent.putExtra("json", item.toString());
         startActivity(intent);
     }
 

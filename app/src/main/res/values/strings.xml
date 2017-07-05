@@ -5,5 +5,4 @@
     <string name="score">Score:</string>
     <string name="most_popular">Most popular</string>
     <string name="highest_rated">Highest rated</string>
-    <string name="error_message">Unable to load</string>
 </resources>

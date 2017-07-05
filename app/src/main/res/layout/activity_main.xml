@@ -13,8 +13,8 @@
     </android.support.v7.widget.RecyclerView>
 
     <ProgressBar
-        android:layout_width="@dimens/progress_bar_size"
-        android:layout_height="@dimens/progress_bar_size"
+        android:layout_width="@dimen/progress_bar_size"
+        android:layout_height="@dimen/progress_bar_size"
         android:layout_gravity="center"
         android:id="@+id/main_progress_bar"/>
 </merge>

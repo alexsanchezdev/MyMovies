@@ -9,12 +9,14 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
-    private ArrayList<String> mMoviesPosters;
-    private ArrayList<String> mMoviesIds;
+    private ArrayList<JSONObject> mMoviesObjects;
     private ImageView mImageView;
     private Context mContext;
     private final static String BASE_POSTER_URL = "http://image.tmdb.org/t/p/w185/";
@@ -22,7 +24,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     final private MoviesAdapterOnClickHandler mClickHandler;
 
     public interface MoviesAdapterOnClickHandler {
-        void onListItemClick(String item);
+        void onListItemClick(JSONObject item);
     }
 
     public MoviesAdapter(MoviesAdapterOnClickHandler handler){
@@ -51,8 +53,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     @Override
     public int getItemCount() {
-        if (mMoviesPosters != null){
-            return mMoviesPosters.size();
+        if (mMoviesObjects != null){
+            return mMoviesObjects.size();
         } else {
             return 0;
         }
@@ -70,19 +72,23 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         }
 
         void bind(int index){
-            Picasso.with(mContext).load(BASE_POSTER_URL + mMoviesPosters.get(index)).error(R.drawable.empty_thumbnail).into(mImageView);
+            try {
+                String posterPath = mMoviesObjects.get(index).getString("poster_path");
+                Picasso.with(mContext).load(BASE_POSTER_URL + posterPath).error(R.drawable.empty_thumbnail).into(mImageView);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mClickHandler.onListItemClick(mMoviesIds.get(clickedPosition));
+            mClickHandler.onListItemClick(mMoviesObjects.get(clickedPosition));
         }
     }
 
-    public void setMovieData(Context context, ArrayList<String> moviesPosters, ArrayList<String> moviesIds) {
-        mMoviesPosters = moviesPosters;
-        mMoviesIds = moviesIds;
+    public void setMovieData(Context context, ArrayList<JSONObject> moviesObjects) {
+        mMoviesObjects = moviesObjects;
         mContext = context;
         notifyDataSetChanged();
     }
