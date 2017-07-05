@@ -19,8 +19,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailActivity"
-            android:label="Film details"
-            android:parentActivityName=".MainActivity"/>
+            android:label="Loading..."
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/CustomNoActionBarLight"/>
     </application>
 
 </manifest>
