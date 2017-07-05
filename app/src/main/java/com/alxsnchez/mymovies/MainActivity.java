@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private final ArrayList<String> mMoviesIds = new ArrayList<>();
 
     private MoviesAdapter mMoviesAdapter;
-    private GridLayoutManager mLayoutManager;
+    private StaggeredGridLayoutManager mLayoutManager;
     private ProgressBar mProgressBar;
 
     private final static String BASE_URL = "https://api.themoviedb.org/3/movie";
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mProgressBar = (ProgressBar) findViewById(R.id.main_progress_bar);
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
-        mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
