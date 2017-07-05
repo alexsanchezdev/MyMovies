@@ -19,9 +19,9 @@
             app:expandedTitleTextAppearance="@android:color/transparent"
             app:contentScrim="@color/colorPrimary"
             android:fitsSystemWindows="true"
-            app:expandedTitleMarginStart="16dp"
-            app:expandedTitleMarginEnd="16dp"
-            app:expandedTitleMarginBottom="20dp">
+            app:expandedTitleMarginStart="@dimen/default_padding"
+            app:expandedTitleMarginEnd="@dimen/default_padding"
+            app:expandedTitleMarginBottom="@dimen/default_padding">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -70,8 +70,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/tv_movie_date"
-                    android:textSize="24sp"
-                    android:padding="16dp"
+                    android:textSize="@dimen/title_text_size"
+                    android:padding="@dimen/default_padding"
                     android:textStyle="bold"
                     android:textColor="@color/black"/>
 
@@ -85,19 +85,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/tv_movie_rating"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/subtitle_text_size"
                     android:text="@string/score"
                     android:textStyle="normal"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:paddingStart="16dp"
+                    android:paddingLeft="@dimen/default_padding"
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingStart="@dimen/default_padding"
                     android:textColor="@color/black" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/tv_movie_score"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/subtitle_text_size"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -115,8 +115,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_movie_overview"
                 android:layout_below="@id/linear_layout"
-                android:padding="16dp"
-                android:textSize="16sp"
+                android:padding="@dimen/default_padding"
+                android:textSize="@dimen/paragraph_text_size"
                 android:textColor="@color/black"/>
         </RelativeLayout>
 
