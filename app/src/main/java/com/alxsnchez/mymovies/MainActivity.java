@@ -2,6 +2,7 @@ package com.alxsnchez.mymovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private final ArrayList<String> mMoviesPosters = new ArrayList<>();
     private final ArrayList<String> mMoviesIds = new ArrayList<>();
 
+    private RecyclerView mRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private StaggeredGridLayoutManager mLayoutManager;
     private ProgressBar mProgressBar;
@@ -47,14 +49,20 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         mProgressBar = (ProgressBar) findViewById(R.id.main_progress_bar);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
-        mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
-
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
         mMoviesAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mMoviesAdapter);
 
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+        }
+        else {
+            mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+        }
+
+        mRecyclerView.setHasFixedSize(true);
         requestInformation(SORT_POPULAR);
     }
 
